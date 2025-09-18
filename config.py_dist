@@ -1,0 +1,36 @@
+# N2YO API Configuration
+N2YO_API_KEY = 'XXXXXX-XXXXXX-XXXXXX-XXXX'
+
+# Location Configuration
+QTH_LATITUDE = 49.195469
+QTH_LONGITUDE = 9.235557
+QTH_ELEVATION = 100  # Elevation in meters
+TIMEZONE = 'Europe/Berlin'
+
+# List of satellites you want to display
+# add a color per satellite to make the table easier to read
+SATELLITE_IDS = [
+    (25544, '#FEED14'),    # ISS
+    (27607, '#F8F0C4'),    # SO-50
+    (39444, '#E9F9C7'),    # AO-73
+    (7530, '#D0E8B2'),     # AO-07
+    (43017, '#C2E6D6'),    # AO-91
+    (43803, '#E4F8D6'),    # JO-97
+    (43678, '#CAEBEC'),    # PO-101
+    (44909, '#FFAAD0'),    # DOSAAF-85
+    # Add more satellite IDs and colors here
+]
+
+# Minimum elevation for each SAT
+MIN_ELEVATION = 10
+
+# Number of days to display
+DAYS = 2
+
+# Logging Configuration
+LOG_FILE = 'satpasses.log'
+LOG_LEVEL = 'INFO'
+
+# HTML Output Configuration
+HTML_OUTPUT_FILE = '/var/www/domain/index.html'
+
