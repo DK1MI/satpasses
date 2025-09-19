@@ -179,7 +179,7 @@ class SatellitePassTracker:
 
             row = f"""
             <tr bgcolor="{pass_info['color']}">
-                <td>{html.escape(pass_info['satname'])}</td>
+                <td><a href="https://www.n2yo.com/passes/?s={pass_info['satid']}">{html.escape(pass_info['satname'])}</a></td>
                 <td>{start_time.strftime('%Y-%m-%d %H:%M:%S')}</td>
                 <td>{pass_info['maxEl']:.2f}°</td>
                 <td>{duration}</td>
