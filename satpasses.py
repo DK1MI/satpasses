@@ -27,6 +27,28 @@ class SatellitePassTracker:
             format='%(asctime)s - %(levelname)s - %(message)s'
         )
 
+    def get_cell_color(self, max_elevation: float) -> str:
+        """
+        Generate an HTML color hex code for green based on max elevation.
+
+        Args:
+        max_elevation (float): A value between 0 and 90 that determines the intensity of the color.
+
+        Returns:
+        str: An HTML color hex code
+        """
+        # Validate input
+        if not 0 <= max_elevation <= 90:
+            raise ValueError("max_elevation must be between 0 and 90")
+
+        # Normalize the elevation to a scale of 0-1
+        normalized_elevation = max_elevation / 90
+
+        color_intensity = int(255 * (normalized_elevation ** 0.5))  # Square root for more gradual initial increase
+    
+        hex_color = f'#66{color_intensity:02x}66'
+        return hex_color
+
     def get_satellite_passes(self, sat_id):
         """
         Retrieve satellite pass information from n2yo.com
@@ -45,6 +67,7 @@ class SatellitePassTracker:
         try:
             response = requests.get(url)
             response.raise_for_status()
+            #print(response.json())
             return response.json()
         except requests.RequestException as e:
             logging.error(f"Error in API request for satellite {sat_id}: {e}")
@@ -57,7 +80,7 @@ class SatellitePassTracker:
         # Collect passes for all configured satellites
         all_passes = []
 
-        for sat_id, color in config.SATELLITE_IDS:
+        for sat_id in config.SATELLITE_IDS:
             passes_data = self.get_satellite_passes(sat_id)
 
             if not passes_data or 'passes' not in passes_data:
@@ -67,7 +90,6 @@ class SatellitePassTracker:
             # Extend passes with satellite information
             for pass_info in passes_data['passes']:
                 pass_info['satid'] = sat_id
-                pass_info['color'] = color
                 pass_info['satname'] = passes_data['info']['satname']
                 all_passes.append(pass_info)
 
@@ -105,9 +127,10 @@ class SatellitePassTracker:
         body {{
             font-family: Arial, sans-serif;
             line-height: 1.6;
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            background-color:#f9f9f9;
         }}
         table {{
             width: 100%;
@@ -118,6 +141,7 @@ class SatellitePassTracker:
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
+            white-space: nowrap;
         }}
         th {{
             background-color: #f2f2f2;
@@ -126,6 +150,10 @@ class SatellitePassTracker:
             color: #333;
             text-align: center;
         }}
+        a:link, a:visited {{
+            color: #000000;
+        }}
+    </style>
     </style>
 </head>
 <body>
@@ -136,8 +164,9 @@ class SatellitePassTracker:
         <thead>
             <tr>
                 <th>Satellite</th>
-                <th>Start</th>
-                <th>Max Elevation</th>
+                <th>Date</th>
+                <th>AOS</th>
+                <th>Max El.</th>
                 <th>Duration</th>
             </tr>
         </thead>
@@ -178,9 +207,10 @@ class SatellitePassTracker:
             duration = end_time - start_time
 
             row = f"""
-            <tr bgcolor="{pass_info['color']}">
+            <tr bgcolor="{self.get_cell_color(pass_info['maxEl'])}">
                 <td><a href="https://www.n2yo.com/passes/?s={pass_info['satid']}">{html.escape(pass_info['satname'])}</a></td>
-                <td>{start_time.strftime('%Y-%m-%d %H:%M:%S')}</td>
+                <td>{start_time.strftime('%Y-%m-%d')}</td>
+                <td>{start_time.strftime('%H:%M:%S')}</td>
                 <td>{pass_info['maxEl']:.2f}°</td>
                 <td>{duration}</td>
             </tr>
